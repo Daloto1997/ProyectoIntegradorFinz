@@ -1,0 +1,487 @@
+/* ============================================================
+   FINZ+ DESIGN SYSTEM
+   Paleta: verde esmeralda (éxito/finanzas) + gris oscuro
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Colores primarios */
+    --finz-green:       #10b981;
+    --finz-green-dark:  #059669;
+    --finz-green-light: #d1fae5;
+    --finz-red:         #ef4444;
+    --finz-red-light:   #fee2e2;
+    --finz-blue:        #3b82f6;
+    --finz-blue-light:  #dbeafe;
+    --finz-purple:      #8b5cf6;
+    --finz-yellow:      #f59e0b;
+
+    /* Escala de grises */
+    --finz-gray-50:  #f9fafb;
+    --finz-gray-100: #f3f4f6;
+    --finz-gray-200: #e5e7eb;
+    --finz-gray-300: #d1d5db;
+    --finz-gray-400: #9ca3af;
+    --finz-gray-500: #6b7280;
+    --finz-gray-700: #374151;
+    --finz-gray-800: #1f2937;
+    --finz-gray-900: #111827;
+
+    /* Superficies */
+    --finz-bg:          #f3f4f6;
+    --finz-surface:     #ffffff;
+    --finz-surface-2:   #f9fafb;
+    --finz-border:      #e5e7eb;
+
+    /* Tipografía */
+    --finz-font: 'Inter', system-ui, -apple-system, sans-serif;
+    --finz-radius:   12px;
+    --finz-radius-sm: 8px;
+    --finz-shadow:   0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --finz-shadow-md:0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -1px rgba(0,0,0,.04);
+
+    /* Navbar */
+    --finz-navbar-h: 60px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--finz-font);
+    font-size: 14px;
+    color: var(--finz-gray-700);
+    background: var(--finz-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.finz-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--finz-navbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: var(--finz-surface);
+    border-bottom: 1px solid var(--finz-border);
+    box-shadow: var(--finz-shadow);
+}
+
+.finz-navbar__brand,
+.finz-navbar__logo {
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--finz-gray-900);
+    letter-spacing: -0.5px;
+}
+.finz-navbar__logo span { color: var(--finz-green); }
+
+.finz-navbar__links {
+    display: flex;
+    gap: 4px;
+}
+
+.finz-navbar__user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.finz-navbar__nombre {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--finz-gray-700);
+}
+
+.finz-navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ============================================================
+   NAVIGATION LINKS
+   ============================================================ */
+.finz-nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: var(--finz-radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--finz-gray-500);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+.finz-nav-link:hover { background: var(--finz-gray-100); color: var(--finz-gray-900); }
+.finz-nav-link.active { background: var(--finz-green-light); color: var(--finz-green-dark); }
+.finz-nav-link--admin { color: #dc2626; }
+.finz-nav-link--admin:hover { background: #fee2e2; color: #b91c1c; }
+.finz-nav-link--admin.active { background: #fee2e2; color: #b91c1c; }
+.finz-nav-link--locked { opacity: 0.45; }
+.finz-nav-link--locked:hover { background: transparent; color: var(--finz-gray-500); }
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+.finz-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--finz-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+.finz-btn:hover   { filter: brightness(0.92); }
+.finz-btn:active  { transform: scale(0.98); }
+.finz-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.finz-btn--primary  { background: var(--finz-green); color: #fff; }
+.finz-btn--ingreso  { background: var(--finz-green); color: #fff; }
+.finz-btn--gasto    { background: var(--finz-red);   color: #fff; }
+.finz-btn--danger   { background: var(--finz-red);   color: #fff; }
+.finz-btn--ghost    { background: transparent; color: var(--finz-gray-500); border: 1px solid var(--finz-border); }
+.finz-btn--logout   { background: transparent; color: var(--finz-gray-500); border: 1px solid var(--finz-border); font-size: 13px; padding: 5px 12px; }
+.finz-btn--logout:hover { background: var(--finz-red-light); color: var(--finz-red); border-color: var(--finz-red); filter: none; }
+.finz-btn--outline-sm { background: transparent; color: var(--finz-green-dark); border: 1px solid var(--finz-green); padding: 6px 14px; font-size: 13px; }
+
+/* ============================================================
+   BADGES / PILLS
+   ============================================================ */
+.finz-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.finz-badge--green  { background: var(--finz-green); }
+.finz-badge--red    { background: var(--finz-red); }
+.finz-badge--blue   { background: var(--finz-blue); }
+.finz-badge--gray   { background: var(--finz-gray-400); }
+.finz-badge--purple { background: var(--finz-purple); }
+.finz-badge--yellow { background: var(--finz-yellow); color: #fff; }
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+.finz-main {
+    min-height: calc(100vh - var(--finz-navbar-h));
+    padding: 24px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.finz-card {
+    background: var(--finz-surface);
+    border-radius: var(--finz-radius);
+    border: 1px solid var(--finz-border);
+    box-shadow: var(--finz-shadow);
+    padding: 20px;
+}
+.finz-card--form {
+    border-left: 4px solid var(--finz-green);
+}
+.finz-card--ingreso { border-left: 4px solid var(--finz-green); }
+.finz-card--gasto   { border-left: 4px solid var(--finz-red); }
+.finz-card--saldo   { border-left: 4px solid var(--finz-blue); }
+
+.finz-card__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--finz-gray-800);
+    margin-bottom: 16px;
+}
+
+/* ============================================================
+   STAT CARDS (KPIs del Dashboard)
+   ============================================================ */
+.finz-stat-card {
+    background: var(--finz-surface);
+    border-radius: var(--finz-radius);
+    border: 1px solid var(--finz-border);
+    box-shadow: var(--finz-shadow);
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+}
+.finz-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+}
+.finz-stat-card--saldo::before   { background: var(--finz-blue); }
+.finz-stat-card--ingreso::before { background: var(--finz-green); }
+.finz-stat-card--gasto::before   { background: var(--finz-red); }
+
+.finz-stat-card__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--finz-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+}
+.finz-stat-card__value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--finz-gray-900);
+    letter-spacing: -0.5px;
+}
+.finz-stat-card__sub {
+    font-size: 12px;
+    color: var(--finz-gray-400);
+    margin-top: 4px;
+}
+.finz-stat-card__value--positive { color: var(--finz-green-dark); }
+.finz-stat-card__value--negative { color: var(--finz-red); }
+
+/* ============================================================
+   FORMULARIOS
+   ============================================================ */
+.finz-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--finz-gray-700);
+    margin-bottom: 6px;
+}
+.finz-input,
+.finz-select {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--finz-border);
+    border-radius: var(--finz-radius-sm);
+    font-size: 14px;
+    font-family: var(--finz-font);
+    color: var(--finz-gray-800);
+    background: var(--finz-surface);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+}
+.finz-input:focus,
+.finz-select:focus {
+    border-color: var(--finz-green);
+    box-shadow: 0 0 0 3px rgba(16,185,129,.15);
+}
+.finz-input.error { border-color: var(--finz-red); }
+.finz-error-msg { font-size: 12px; color: var(--finz-red); margin-top: 4px; }
+
+.finz-form__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--finz-gray-800);
+    margin-bottom: 14px;
+}
+
+/* Selector INGRESO / GASTO */
+.finz-tipo-selector {
+    display: flex;
+    border: 1px solid var(--finz-border);
+    border-radius: var(--finz-radius-sm);
+    overflow: hidden;
+    width: fit-content;
+}
+.finz-tipo-btn {
+    padding: 7px 20px;
+    border: none;
+    background: var(--finz-gray-100);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--finz-gray-500);
+    transition: background 0.15s, color 0.15s;
+}
+.finz-tipo-btn--ingreso.active { background: var(--finz-green); color: #fff; }
+.finz-tipo-btn--gasto.active   { background: var(--finz-red);   color: #fff; }
+
+/* ============================================================
+   ALERTAS
+   ============================================================ */
+.finz-alert {
+    padding: 10px 14px;
+    border-radius: var(--finz-radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+.finz-alert--danger  { background: var(--finz-red-light);  color: #b91c1c; border-left: 3px solid var(--finz-red); }
+.finz-alert--success { background: var(--finz-green-light); color: #065f46; border-left: 3px solid var(--finz-green); }
+.finz-alert--warning { background: #fffbeb; color: #92400e; border-left: 3px solid var(--finz-yellow); }
+.finz-alert--info    { background: var(--finz-blue-light);  color: #1e40af; border-left: 3px solid var(--finz-blue); }
+
+/* ============================================================
+   TABLAS
+   ============================================================ */
+.finz-table { width: 100%; border-collapse: collapse; }
+.finz-table th {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--finz-gray-400);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--finz-border);
+    text-align: left;
+}
+.finz-table td {
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--finz-gray-100);
+    font-size: 13px;
+    color: var(--finz-gray-700);
+}
+.finz-table tr:last-child td { border-bottom: none; }
+.finz-table tr:hover td { background: var(--finz-gray-50); }
+
+/* ============================================================
+   PÁGINAS AUTH (Login / Registro)
+   ============================================================ */
+.finz-auth-page {
+    min-height: calc(100vh - var(--finz-navbar-h));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+}
+.finz-auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--finz-surface);
+    border-radius: var(--finz-radius);
+    border: 1px solid var(--finz-border);
+    box-shadow: var(--finz-shadow-md);
+    padding: 36px 32px;
+}
+.finz-auth-card__logo {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--finz-gray-900);
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+}
+.finz-auth-card__logo span { color: var(--finz-green); }
+.finz-auth-card__subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--finz-gray-400);
+    margin-bottom: 28px;
+}
+.finz-auth-card__footer {
+    text-align: center;
+    font-size: 13px;
+    color: var(--finz-gray-500);
+    margin-top: 20px;
+}
+.finz-auth-card__footer a { color: var(--finz-green-dark); font-weight: 600; text-decoration: none; }
+.finz-auth-card__footer a:hover { text-decoration: underline; }
+
+/* ============================================================
+   DASHBOARD HEADER
+   ============================================================ */
+.finz-dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.finz-dash-header__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--finz-gray-900);
+}
+.finz-dash-header__sub {
+    font-size: 14px;
+    color: var(--finz-gray-400);
+    margin-top: 2px;
+}
+.finz-dash-header__actions { display: flex; gap: 8px; }
+
+/* ============================================================
+   PREMIUM LOCK OVERLAY
+   ============================================================ */
+.finz-premium-lock {
+    position: relative;
+    border-radius: var(--finz-radius);
+    overflow: hidden;
+}
+.finz-premium-lock__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: var(--finz-radius);
+    gap: 8px;
+}
+.finz-premium-lock__icon {
+    font-size: 32px;
+    margin-bottom: 4px;
+}
+.finz-premium-lock__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--finz-gray-800);
+}
+.finz-premium-lock__sub {
+    font-size: 13px;
+    color: var(--finz-gray-400);
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.finz-progress {
+    height: 8px;
+    background: var(--finz-gray-200);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+.finz-progress__bar {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--finz-green);
+    transition: width 0.4s ease;
+}
+.finz-progress__bar--warning { background: var(--finz-yellow); }
+.finz-progress__bar--danger  { background: var(--finz-red); }
+
+/* ============================================================
+   SCROLL & MISC
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--finz-gray-100); }
+::-webkit-scrollbar-thumb { background: var(--finz-gray-300); border-radius: 99px; }
+
+.text-positive { color: var(--finz-green-dark); font-weight: 600; }
+.text-negative { color: var(--finz-red); font-weight: 600; }
+.text-muted-sm { font-size: 12px; color: var(--finz-gray-400); }
