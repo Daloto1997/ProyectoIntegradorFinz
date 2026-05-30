@@ -7,6 +7,7 @@ import Registro from './pages/Registro';
 import Dashboard from './pages/Dashboard';
 import Analitica from './pages/Analitica';
 import AdminPanel from './pages/AdminPanel';
+import Setup from './pages/Setup';
 
 function App() {
     return (
@@ -17,6 +18,9 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/registro" element={<Registro />} />
+                        <Route path="/setup" element={
+                            <ProtectedRoute><Setup /></ProtectedRoute>
+                        } />
                         <Route path="/dashboard" element={
                             <ProtectedRoute><Dashboard /></ProtectedRoute>
                         } />

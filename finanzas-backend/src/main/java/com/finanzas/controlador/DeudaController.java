@@ -22,8 +22,8 @@ public class DeudaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Deuda>> findAll() {
-        return ResponseEntity.ok(deudaService.findAll());
+    public ResponseEntity<List<Deuda>> findAll(@RequestParam(required = false) String usuarioEmail) {
+        return ResponseEntity.ok(deudaService.findAll(usuarioEmail));
     }
 
     @GetMapping("/{id}")

@@ -19,6 +19,9 @@ public class Meta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "usuario_email", length = 100)
+    private String usuarioEmail;
+
     @Column(nullable = false, length = 100)
     private String nombre;
 

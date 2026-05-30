@@ -119,6 +119,11 @@ export const finzService = {
         localStorage.setItem(key, JSON.stringify(value));
     },
 
+    emailParam: () => {
+        const u = finzService.obtenerUsuarioLogueado();
+        return u?.email ? `?usuarioEmail=${encodeURIComponent(u.email)}` : '';
+    },
+
     obtenerCategorias: async () => {
         try {
             const response = await fetch(`${API_BASE}/categorias`, {
@@ -140,7 +145,7 @@ export const finzService = {
 
     obtenerTransacciones: async () => {
         try {
-            const response = await fetch(`${API_BASE}/transacciones`, {
+            const response = await fetch(`${API_BASE}/transacciones${finzService.emailParam()}`, {
                 credentials: 'include'
             });
             if (!response.ok) {
@@ -214,7 +219,7 @@ export const finzService = {
 
     obtenerCuentas: async () => {
         try {
-            const response = await fetch(`${API_BASE}/cuentas`, {
+            const response = await fetch(`${API_BASE}/cuentas${finzService.emailParam()}`, {
                 credentials: 'include'
             });
             if (!response.ok) {
@@ -274,10 +279,9 @@ export const finzService = {
         }
     },
 
-    obtenerDeudas: async (usuarioEmail) => {
+    obtenerDeudas: async () => {
         try {
-            const query = usuarioEmail ? `?usuarioEmail=${encodeURIComponent(usuarioEmail)}` : '';
-            const response = await fetch(`${API_BASE}/deudas${query}`, {
+            const response = await fetch(`${API_BASE}/deudas${finzService.emailParam()}`, {
                 credentials: 'include'
             });
             if (!response.ok) {
@@ -286,22 +290,21 @@ export const finzService = {
             }
             const payload = await response.json();
             const deudas = Array.isArray(payload) ? payload : payload?.data ?? [];
-            return deudas.length ? deudas : finzService.leerLocal(KEYS.DEUDAS_KEY).filter(deuda => !usuarioEmail || deuda.usuarioEmail === usuarioEmail);
+            return deudas.length ? deudas : finzService.leerLocal(KEYS.DEUDAS_KEY);
         } catch (error) {
             console.warn('Error al obtener deudas:', error);
-            return finzService.leerLocal(KEYS.DEUDAS_KEY).filter(deuda => !usuarioEmail || deuda.usuarioEmail === usuarioEmail);
+            return finzService.leerLocal(KEYS.DEUDAS_KEY);
         }
     },
 
     guardarDeuda: async (nuevaDeuda) => {
-        // Mapear al contrato que el backend suele esperar
-        const payload = {
+        const payload = finzService.adjuntarUsuario({
             personaEntidad: nuevaDeuda.acreedor || nuevaDeuda.personaEntidad || '',
             montoTotal: nuevaDeuda.montoTotal,
             montoPagado: nuevaDeuda.montoPagado ?? 0,
             tipo: nuevaDeuda.tipo || 'POR_PAGAR',
             fechaVencimiento: nuevaDeuda.fechaVencimiento || null
-        };
+        });
 
         try {
             const response = await fetch(`${API_BASE}/deudas`, {
@@ -361,7 +364,7 @@ export const finzService = {
 
     obtenerMetas: async () => {
         try {
-            const response = await fetch(`${API_BASE}/metas`, {
+            const response = await fetch(`${API_BASE}/metas${finzService.emailParam()}`, {
                 credentials: 'include'
             });
             if (!response.ok) {
@@ -378,12 +381,12 @@ export const finzService = {
     },
 
     guardarMeta: async (meta) => {
-        const payload = {
+        const payload = finzService.adjuntarUsuario({
             nombre: meta.nombre || meta.titulo || '',
             montoObjetivo: meta.montoObjetivo,
             montoActual: meta.montoActual ?? 0,
             fechaLimite: meta.fechaLimite || null
-        };
+        });
 
         try {
             const response = await fetch(`${API_BASE}/metas`, {
@@ -417,6 +420,22 @@ export const finzService = {
             const metaLocal = { ...payload, id: Date.now() };
             metas.push(metaLocal);
             finzService.escribirLocal(KEYS.METAS, metas);
+            throw error;
+        }
+    },
+
+    actualizarMeta: async (id, cambios) => {
+        try {
+            const response = await fetch(`${API_BASE}/metas/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(cambios)
+            });
+            if (!response.ok) throw new Error(response.statusText);
+            return await response.json();
+        } catch (error) {
+            console.error('Error en actualizarMeta:', error);
             throw error;
         }
     },

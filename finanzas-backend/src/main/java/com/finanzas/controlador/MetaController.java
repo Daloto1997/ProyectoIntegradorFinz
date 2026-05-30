@@ -22,8 +22,8 @@ public class MetaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Meta>> findAll() {
-        return ResponseEntity.ok(metaService.findAll());
+    public ResponseEntity<List<Meta>> findAll(@RequestParam(required = false) String usuarioEmail) {
+        return ResponseEntity.ok(metaService.findAll(usuarioEmail));
     }
 
     @GetMapping("/{id}")

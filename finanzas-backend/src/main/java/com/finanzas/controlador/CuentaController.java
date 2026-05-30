@@ -22,8 +22,8 @@ public class CuentaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cuenta>> findAll() {
-        return ResponseEntity.ok(cuentaService.findAll());
+    public ResponseEntity<List<Cuenta>> findAll(@RequestParam(required = false) String usuarioEmail) {
+        return ResponseEntity.ok(cuentaService.findAll(usuarioEmail));
     }
 
     @GetMapping("/{id}")

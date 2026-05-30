@@ -21,6 +21,7 @@ export default function Cuentas() {
     const [cuentas,   setCuentas]   = useState([]);
     const [error,     setError]     = useState(null);
     const [guardando, setGuardando] = useState(false);
+    const [exito,     setExito]     = useState(false);
 
     useEffect(() => {
         finzService.obtenerCuentas()
@@ -38,7 +39,9 @@ export default function Cuentas() {
                 saldoActual: parseFloat(data.saldo) || 0,
             });
             setCuentas(prev => [...prev, nueva]);
-            reset({ tipo: 'AHORROS' });
+            reset({ tipo: 'AHORROS', nombre: '', saldo: '' });
+            setExito(true);
+            setTimeout(() => setExito(false), 3000);
         } catch (err) {
             setError(`No se pudo guardar: ${err.message}`);
         } finally {
@@ -63,7 +66,8 @@ export default function Cuentas() {
                     Registra cada lugar donde guardas dinero: banco, Nequi, efectivo, etc.
                 </p>
 
-                {error && <div className="alert alert-danger py-2 small">{error}</div>}
+                {error  && <div className="alert alert-danger  py-2 small">{error}</div>}
+                {exito  && <div className="alert alert-success py-2 small">✓ Cuenta agregada correctamente.</div>}
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     {/* Tipo de cuenta */}

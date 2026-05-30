@@ -12,13 +12,18 @@ const formatoMoneda = (valor) =>
     new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor);
 
 export default function Dashboard() {
-    const [movimientos, setMovimientos] = useState([]);
+    const [movimientos,   setMovimientos]   = useState([]);
+    const [saldoCuentas,  setSaldoCuentas]  = useState(0);
     const { usuario, esPremium } = useAuth();
     const navigate = useNavigate();
 
     const cargarDatos = async () => {
-        const datos = await finzService.obtenerTransacciones();
+        const [datos, cuentas] = await Promise.all([
+            finzService.obtenerTransacciones(),
+            finzService.obtenerCuentas()
+        ]);
         setMovimientos(datos);
+        setSaldoCuentas(cuentas.reduce((acc, c) => acc + Number(c.saldoActual ?? 0), 0));
     };
 
     const eliminarMovimiento = async (id) => {
@@ -42,7 +47,7 @@ export default function Dashboard() {
         .filter(m => m.tipo === 'GASTO')
         .reduce((acc, m) => acc + Math.abs(Number(m.monto)), 0);
 
-    const saldoTotal = ingresos - gastos;
+    const saldoTotal = saldoCuentas;
 
     return (
         <div>
@@ -70,7 +75,7 @@ export default function Dashboard() {
                             {formatoMoneda(saldoTotal)}
                         </div>
                         <div className="finz-stat-card__sub">
-                            {saldoTotal < 0 ? 'Estás en números rojos' : 'Vas por buen camino'}
+                            {saldoTotal === 0 ? 'Agrega tus cuentas para ver tu saldo' : 'Total en tus cuentas'}
                         </div>
                     </div>
                 </div>

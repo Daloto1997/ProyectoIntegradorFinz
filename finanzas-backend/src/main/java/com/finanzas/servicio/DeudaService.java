@@ -21,7 +21,10 @@ public class DeudaService {
         return deudaRepository.save(deuda);
     }
 
-    public List<Deuda> findAll() {
+    public List<Deuda> findAll(String usuarioEmail) {
+        if (usuarioEmail != null && !usuarioEmail.isBlank()) {
+            return deudaRepository.findByUsuarioEmail(usuarioEmail);
+        }
         return deudaRepository.findAll();
     }
 

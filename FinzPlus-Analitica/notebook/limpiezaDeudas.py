@@ -8,7 +8,8 @@ def limpiar_datos_deudas(data_frame_sucio):
     data_frame_limpio["tipo"] = data_frame_limpio["tipo"].astype("string").str.strip().str.lower()
 
     # 2. Controlar valores inesperados (Tipos de deuda definidos en Finz+)
-    valores_esperados_tipos = ["bancaria", "personal", "comercial"]
+    # Se aceptan tipos del sistema Finz+ y tipos de simulación
+    valores_esperados_tipos = ["bancaria", "personal", "comercial", "por_pagar", "por_cobrar"]
     data_frame_limpio["tipo"] = data_frame_limpio["tipo"].where(
         data_frame_limpio["tipo"].isin(valores_esperados_tipos),
         pd.NA

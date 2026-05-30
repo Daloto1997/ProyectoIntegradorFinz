@@ -16,7 +16,8 @@ export default function FormularioMovimiento({ alGuardar }) {
         finzService.obtenerCategorias().then(lista => {
             if (lista.length) {
                 setCategorias(lista);
-                setCatId(String(lista[0].id ?? lista[0].nombre ?? lista[0]));
+                const primeraGasto = lista.find(c => c.tipo === 'GASTO');
+                setCatId(String((primeraGasto ?? lista[0]).id));
             }
         });
         finzService.obtenerCuentas().then(lista => {
@@ -26,6 +27,15 @@ export default function FormularioMovimiento({ alGuardar }) {
             }
         });
     }, []);
+
+    // Al cambiar entre INGRESO y GASTO, resetear la categoría a la primera del nuevo tipo
+    useEffect(() => {
+        if (!categorias.length) return;
+        const filtradas = categorias.filter(c => !c.tipo || c.tipo === tipo);
+        if (filtradas.length) {
+            setCatId(String(filtradas[0].id ?? filtradas[0].nombre ?? filtradas[0]));
+        }
+    }, [tipo, categorias]);
 
     const manejarEnvio = async (e) => {
         e.preventDefault();
@@ -96,7 +106,7 @@ export default function FormularioMovimiento({ alGuardar }) {
             <div className="row g-3">
                 <div className="col-md-5">
                     <label className="finz-label">Descripción</label>
-                    <input ref={descRef} type="text" className="finz-input" placeholder="¿En qué gastaste?" required />
+                    <input ref={descRef} type="text" className="finz-input" placeholder={tipo === 'INGRESO' ? '¿De dónde provino?' : '¿En qué gastaste?'} required />
                 </div>
 
                 <div className="col-md-3">

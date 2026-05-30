@@ -21,7 +21,10 @@ public class CuentaService {
         return cuentaRepository.save(cuenta);
     }
 
-    public List<Cuenta> findAll() {
+    public List<Cuenta> findAll(String usuarioEmail) {
+        if (usuarioEmail != null && !usuarioEmail.isBlank()) {
+            return cuentaRepository.findByUsuarioEmail(usuarioEmail);
+        }
         return cuentaRepository.findAll();
     }
 
@@ -35,6 +38,7 @@ public class CuentaService {
         Cuenta existente = findById(id);
         existente.setNombre(cuentaActualizada.getNombre());
         existente.setSaldoActual(cuentaActualizada.getSaldoActual());
+        existente.setTipo(cuentaActualizada.getTipo());
         return cuentaRepository.save(existente);
     }
 

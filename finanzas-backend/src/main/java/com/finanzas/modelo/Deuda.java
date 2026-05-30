@@ -19,6 +19,9 @@ public class Deuda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "usuario_email", length = 100)
+    private String usuarioEmail;
+
     @Column(name = "persona_entidad", nullable = false, length = 100)
     private String personaEntidad;
 

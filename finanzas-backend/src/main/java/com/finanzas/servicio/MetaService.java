@@ -21,7 +21,10 @@ public class MetaService {
         return metaRepository.save(meta);
     }
 
-    public List<Meta> findAll() {
+    public List<Meta> findAll(String usuarioEmail) {
+        if (usuarioEmail != null && !usuarioEmail.isBlank()) {
+            return metaRepository.findByUsuarioEmail(usuarioEmail);
+        }
         return metaRepository.findAll();
     }
 
@@ -42,7 +45,7 @@ public class MetaService {
 
     @Transactional
     public void deleteById(Long id) {
-        findById(id); // lanza 404 si no existe antes de intentar borrar
+        findById(id);
         metaRepository.deleteById(id);
     }
 }

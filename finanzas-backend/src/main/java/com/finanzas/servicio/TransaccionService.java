@@ -49,10 +49,17 @@ public class TransaccionService {
                 .descripcion(request.descripcion())
                 .build();
 
+        // Actualizar saldo de la cuenta (monto positivo = ingreso, negativo = gasto)
+        cuenta.setSaldoActual(cuenta.getSaldoActual().add(request.monto()));
+        cuentaRepository.save(cuenta);
+
         return transaccionRepository.save(transaccion);
     }
 
-    public List<Transaccion> findAll() {
+    public List<Transaccion> findAll(String usuarioEmail) {
+        if (usuarioEmail != null && !usuarioEmail.isBlank()) {
+            return transaccionRepository.findByCuentaUsuarioEmail(usuarioEmail);
+        }
         return transaccionRepository.findAll();
     }
 
@@ -84,7 +91,11 @@ public class TransaccionService {
 
     @Transactional
     public void deleteById(Long id) {
-        findById(id);
+        Transaccion t = findById(id);
+        // Revertir el efecto en el saldo de la cuenta
+        Cuenta cuenta = t.getCuenta();
+        cuenta.setSaldoActual(cuenta.getSaldoActual().subtract(t.getMonto()));
+        cuentaRepository.save(cuenta);
         transaccionRepository.deleteById(id);
     }
 }

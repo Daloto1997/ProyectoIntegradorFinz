@@ -1,33 +1,72 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 // Proxy de Vite redirige /flask → localhost:5001 (sin CORS)
 const FLASK_URL = '/flask';
 
+function SeccionGraficas({ titulo, badge, graficas, titulos, mensajeVacio }) {
+    return (
+        <section className="mb-5">
+            <div className="d-flex align-items-center mb-3">
+                <span className={`badge ${badge} me-2 fs-6`}>{titulo}</span>
+                <hr className="flex-grow-1" />
+            </div>
+            {graficas && Object.keys(graficas).length > 0 ? (
+                <div className="row g-4">
+                    {Object.entries(graficas).map(([clave, imagen]) => (
+                        <div key={clave} className="col-md-6">
+                            <div className="card shadow-sm h-100">
+                                <div className="card-header bg-white border-0 pb-0">
+                                    <small className="text-muted fw-semibold">{titulos[clave] || clave}</small>
+                                </div>
+                                <div className="card-body p-2">
+                                    <img src={imagen} alt={titulos[clave] || clave} className="img-fluid rounded" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="alert alert-secondary">{mensajeVacio}</div>
+            )}
+        </section>
+    );
+}
+
 export default function Analitica() {
-    const [graficasMetas, setGraficasMetas] = useState(null);
-    const [graficasDeudas, setGraficasDeudas] = useState(null);
-    const [cargando, setCargando] = useState(true);
-    const [servidorOffline, setServidorOffline] = useState(false);
+    const [graficasTransacciones, setGraficasTransacciones] = useState(null);
+    const [graficasMetas,         setGraficasMetas]         = useState(null);
+    const [graficasDeudas,        setGraficasDeudas]        = useState(null);
+    const [graficasUsuarios,      setGraficasUsuarios]      = useState(null);
+    const [cargando,              setCargando]              = useState(true);
+    const [servidorOffline,       setServidorOffline]       = useState(false);
     const navigate = useNavigate();
+    const { usuario, esAdmin } = useAuth();
 
     useEffect(() => {
         const cargarGraficas = async () => {
             try {
-                // Si el servidor no responde con 200, lo marcamos como offline
                 const salud = await fetch(`${FLASK_URL}/api/salud`);
-                if (!salud.ok) throw new Error('Flask offline');
+                if (!salud.ok) { setServidorOffline(true); return; }
 
-                const [resMetas, resDeudas] = await Promise.all([
-                    fetch(`${FLASK_URL}/api/graficas/metas`),
-                    fetch(`${FLASK_URL}/api/graficas/deudas`)
-                ]);
+                const emailParam = usuario?.email
+                    ? `?usuarioEmail=${encodeURIComponent(usuario.email)}`
+                    : '';
 
-                if (resMetas.ok) setGraficasMetas(await resMetas.json());
+                const endpoints = [
+                    fetch(`${FLASK_URL}/api/graficas/transacciones${emailParam}`),
+                    fetch(`${FLASK_URL}/api/graficas/metas${emailParam}`),
+                    fetch(`${FLASK_URL}/api/graficas/deudas${emailParam}`),
+                ];
+                if (esAdmin) endpoints.push(fetch(`${FLASK_URL}/api/graficas/usuarios`));
+
+                const [resTrans, resMetas, resDeudas, resUsers] = await Promise.all(endpoints);
+
+                if (resTrans.ok)  setGraficasTransacciones(await resTrans.json());
+                if (resMetas.ok)  setGraficasMetas(await resMetas.json());
                 if (resDeudas.ok) setGraficasDeudas(await resDeudas.json());
-
-                // Si ambas respuestas fallaron aunque el servidor esté "activo"
-                if (!resMetas.ok && !resDeudas.ok) throw new Error('Sin datos del servidor');
+                if (esAdmin && resUsers?.ok) setGraficasUsuarios(await resUsers.json());
 
             } catch {
                 setServidorOffline(true);
@@ -35,19 +74,30 @@ export default function Analitica() {
                 setCargando(false);
             }
         };
-
         cargarGraficas();
     }, []);
 
-    // Titulos amigables para cada clave de gráfica
     const titulos = {
-        cronograma:       "Cronograma de Cumplimiento de Metas",
-        metas_ambiciosas: "Metas de Gran Volumen (≥ 5M)",
-        metas_sin_iniciar:"Metas Sin Iniciar por Categoría",
-        mapa_usuarios:    "Actividad de Ahorro por Usuario",
-        deudas_por_tipo:  "Deudas de Alto Valor por Tipo",
-        acreedores:       "Distribución de Acreedores",
-        deudas_intactas:  "Concentración de Deudas Sin Abonar"
+        // Transacciones
+        proporcion:         "Ingresos vs Egresos",
+        tendencia:          "Volumen de Transacciones por Mes",
+        egresos_categoria:  "Egresos por Categoría",
+        mapa_calor:         "Densidad: Cuentas vs Categorías",
+        alto_valor:         "Transacciones de Alto Valor (> $1.5M)",
+        // Metas
+        cronograma:         "Cronograma de Cumplimiento de Metas",
+        metas_ambiciosas:   "Metas de Gran Volumen (≥ 5M)",
+        metas_sin_iniciar:  "Metas Sin Iniciar por Categoría",
+        mapa_usuarios:      "Actividad de Ahorro por Usuario",
+        // Deudas
+        deudas_por_tipo:    "Deudas de Alto Valor por Tipo",
+        acreedores:         "Distribución de Acreedores",
+        deudas_intactas:    "Concentración de Deudas Sin Abonar",
+        // Usuarios (Admin)
+        roles:              "Distribución por Plan/Rol",
+        crecimiento:        "Crecimiento Mensual de Usuarios",
+        totales_rol:        "Total de Usuarios por Plan",
+        actividad_diaria:   "Actividad de Registros (Últimos 30 Días)",
     };
 
     return (
@@ -95,13 +145,14 @@ export default function Analitica() {
                     {/* Vista previa de qué gráficas habrá cuando esté activo */}
                     <div className="row g-3">
                         {[
-                            { titulo: 'Cronograma de cumplimiento de metas',   icono: '📈', color: '#10b981' },
-                            { titulo: 'Metas de gran volumen (≥ 5M)',           icono: '🎯', color: '#3b82f6' },
-                            { titulo: 'Metas sin iniciar por categoría',        icono: '📊', color: '#f59e0b' },
-                            { titulo: 'Actividad de ahorro por usuario',        icono: '👥', color: '#8b5cf6' },
-                            { titulo: 'Deudas de alto valor por tipo',          icono: '💸', color: '#ef4444' },
-                            { titulo: 'Distribución de acreedores',             icono: '🏦', color: '#ec4899' },
-                            { titulo: 'Concentración de deudas sin abonar',     icono: '⚠️', color: '#f97316' },
+                            { titulo: 'Ingresos vs Egresos',                    icono: '🍩', color: '#25c974' },
+                            { titulo: 'Volumen de transacciones por mes',        icono: '📈', color: '#3b82f6' },
+                            { titulo: 'Egresos por categoría',                  icono: '📊', color: '#f59e0b' },
+                            { titulo: 'Densidad: Cuentas vs Categorías',        icono: '🔥', color: '#8b5cf6' },
+                            { titulo: 'Transacciones de alto valor',            icono: '💸', color: '#ef4444' },
+                            { titulo: 'Cronograma de metas',                    icono: '🎯', color: '#10b981' },
+                            { titulo: 'Deudas por tipo',                        icono: '🏦', color: '#ec4899' },
+                            { titulo: 'Comportamiento de usuarios (Admin)',      icono: '👥', color: '#dc2626' },
                         ].map(g => (
                             <div key={g.titulo} className="col-md-6">
                                 <div className="finz-card" style={{ borderLeft: `4px solid ${g.color}`, minHeight: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '8px', opacity: 0.6 }}>
@@ -121,73 +172,44 @@ export default function Analitica() {
 
             {/* Contenido: gráficas cargadas */}
             {!cargando && !servidorOffline && (
-
                 <>
-                    {/* --- SECCIÓN METAS --- */}
-                    <section className="mb-5">
-                        <div className="d-flex align-items-center mb-3">
-                            <span className="badge bg-success me-2 fs-6">Metas de Ahorro</span>
-                            <hr className="flex-grow-1" />
-                        </div>
+                    {/* --- SECCIÓN USUARIOS (solo Admin) --- */}
+                    {esAdmin && (
+                        <SeccionGraficas
+                            titulo="Comportamiento de Usuarios (Admin)"
+                            badge="bg-danger"
+                            graficas={graficasUsuarios}
+                            titulos={titulos}
+                            mensajeVacio="Sin datos de usuarios para graficar."
+                        />
+                    )}
 
-                        {graficasMetas && Object.keys(graficasMetas).length > 0 ? (
-                            <div className="row g-4">
-                                {Object.entries(graficasMetas).map(([clave, imagen]) => (
-                                    <div key={clave} className="col-md-6">
-                                        <div className="card shadow-sm h-100">
-                                            <div className="card-header bg-white border-0 pb-0">
-                                                <small className="text-muted fw-semibold">
-                                                    {titulos[clave] || clave}
-                                                </small>
-                                            </div>
-                                            <div className="card-body p-2">
-                                                <img
-                                                    src={imagen}
-                                                    alt={titulos[clave] || clave}
-                                                    className="img-fluid rounded"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="alert alert-secondary">Sin datos de metas para graficar.</div>
-                        )}
-                    </section>
+                    {/* --- SECCIÓN TRANSACCIONES --- */}
+                    <SeccionGraficas
+                        titulo="Análisis de Transacciones"
+                        badge="bg-primary"
+                        graficas={graficasTransacciones}
+                        titulos={titulos}
+                        mensajeVacio="Sin datos de transacciones para graficar."
+                    />
+
+                    {/* --- SECCIÓN METAS --- */}
+                    <SeccionGraficas
+                        titulo="Metas de Ahorro"
+                        badge="bg-success"
+                        graficas={graficasMetas}
+                        titulos={titulos}
+                        mensajeVacio="Sin datos de metas para graficar."
+                    />
 
                     {/* --- SECCIÓN DEUDAS --- */}
-                    <section>
-                        <div className="d-flex align-items-center mb-3">
-                            <span className="badge bg-danger me-2 fs-6">Control de Deudas</span>
-                            <hr className="flex-grow-1" />
-                        </div>
-
-                        {graficasDeudas && Object.keys(graficasDeudas).length > 0 ? (
-                            <div className="row g-4">
-                                {Object.entries(graficasDeudas).map(([clave, imagen]) => (
-                                    <div key={clave} className="col-md-6">
-                                        <div className="card shadow-sm h-100">
-                                            <div className="card-header bg-white border-0 pb-0">
-                                                <small className="text-muted fw-semibold">
-                                                    {titulos[clave] || clave}
-                                                </small>
-                                            </div>
-                                            <div className="card-body p-2">
-                                                <img
-                                                    src={imagen}
-                                                    alt={titulos[clave] || clave}
-                                                    className="img-fluid rounded"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="alert alert-secondary">Sin datos de deudas para graficar.</div>
-                        )}
-                    </section>
+                    <SeccionGraficas
+                        titulo="Control de Deudas"
+                        badge="bg-danger"
+                        graficas={graficasDeudas}
+                        titulos={titulos}
+                        mensajeVacio="Sin datos de deudas para graficar."
+                    />
                 </>
             )}
         </div>

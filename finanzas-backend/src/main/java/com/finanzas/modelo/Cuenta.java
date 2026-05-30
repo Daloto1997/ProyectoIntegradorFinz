@@ -23,6 +23,9 @@ public class Cuenta {
     @Column(nullable = false, length = 100)
     private String nombre; // Ej: "Bancolombia", "Nequi", "Efectivo"
 
+    @Column(name = "usuario_email", length = 100)
+    private String usuarioEmail;
+
     @Column(length = 30)
     @Builder.Default
     private String tipo = "AHORROS"; // AHORROS | CORRIENTE | TARJETA | BILLETERA | EFECTIVO | OTRO

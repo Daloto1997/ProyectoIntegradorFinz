@@ -7,12 +7,7 @@ def limpiar_datos_metas(data_frame_sucio):
     # 1. Limpiando textos (eliminar espacios y pasar a minúsculas)
     data_frame_limpio["nombre"] = data_frame_limpio["nombre"].astype("string").str.strip().str.lower()
 
-    # 2. Controlar valores inesperados (opcional, dependiendo de si quieres limitar los nombres de las metas)
-    valores_esperados_metas = ["fondo de emergencia", "viaje a europa", "cuota inicial carro", "ahorro navidad", "pc gamer"]
-    data_frame_limpio["nombre"] = data_frame_limpio["nombre"].where(
-        data_frame_limpio["nombre"].isin(valores_esperados_metas),
-        pd.NA
-    )
+    # 2. Se acepta cualquier nombre de meta (sin restricción de valores)
 
     # --- Limpieza de datos numéricos ---
     # 1. Verificar que los números sí sean números

@@ -1,15 +1,9 @@
 import requests
 
-def consumir_deudas():
-    # URL del endpoint en Spring Boot para obtener el listado de deudas
+def consumir_deudas(usuario_email=None):
     url = "http://localhost:8080/api/deudas"
-    
-    # Se realiza la petición GET al servidor
+    if usuario_email:
+        url += f"?usuarioEmail={usuario_email}"
     respuesta = requests.get(url)
-    
-    # Si el servidor responde con un error (404, 500, etc.), detiene la ejecución
     respuesta.raise_for_status()
-    
-    # Se transforman los datos recibidos a formato JSON (diccionarios/listas de Python)
-    datos = respuesta.json()
-    return datos
+    return respuesta.json()

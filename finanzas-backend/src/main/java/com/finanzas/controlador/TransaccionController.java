@@ -23,8 +23,8 @@ public class TransaccionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Transaccion>> findAll() {
-        return ResponseEntity.ok(transaccionService.findAll());
+    public ResponseEntity<List<Transaccion>> findAll(@RequestParam(required = false) String usuarioEmail) {
+        return ResponseEntity.ok(transaccionService.findAll(usuarioEmail));
     }
 
     @GetMapping("/{id}")
